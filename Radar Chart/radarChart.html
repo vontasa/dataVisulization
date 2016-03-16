@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+  <title>Radar chart</title>
+    <!--CSS-->
+    <link rel="stylesheet" href="../css/foundation.css" />
+    <!--js library-->
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+	<script src="RadarChart.js"></script>
+    <script src="../js/vendor/modernizr.js"></script>
+    <script src="../js/vendor/jquery.js" type="text/javascript"></script>
+    <script src="../js/foundation.min.js" type="text/javascript"></script>
+	<style>
+		body {
+		  overflow: hidden;
+		  margin: 0;
+		  font-size: 14px;
+		  font-family: "Helvetica Neue", Helvetica;
+          height: 2200px;
+          overflow: scroll;
+		}
+		#chart {
+		  position: absolute;
+		  top: 50px;
+		  left: 100px;
+		}	
+	</style>
+  </head>
+  <body>
+      <div><h2>Memorial Hermann Hospital Profile</h2></div>
+    <div>
+        <label>Select Target MMH Hospital</label>
+        <select id="selectOpt" onChange="valueChangeHandler()"  style="width:400px; display: inline-block; display: inline;">
+          <option value="Houston Orthopedic and Spine Hospital">Houston Orthopedic and Spine Hospital</option>
+          <option value="Memorial Hermann - Texas Medical Center">Memorial Hermann - Texas Medical Center</option>
+          <option value="Memorial Hermann Northeast">Memorial Hermann Northeast</option>
+          <option value="Memorial Hermann Northwest Hospital">Memorial Hermann Northwest Hospital</option>
+          <option value="Memorial Hermann Katy Hospital">Memorial Hermann Katy Hospital</option>
+          <option value="Memorial Hermann Sugar Land Hospital">Memorial Hermann Sugar Land Hospital</option>
+          <option value="Memorial Hermann Memorial City Medical Center">Memorial Hermann Memorial City Medical Center</option>
+          <option value="Memorial Hermann Surgical Hospital Kingwood">Memorial Hermann Surgical Hospital Kingwood</option>
+          <option value="Memorial Hermann Surgical Hospital?��First Colony">Memorial Hermann Surgical Hospital First Colony</option>
+        </select>
+        
+        <select id="topOpt" onChange="valueTopHandler()"  style="width:100px;" >
+          <option value="6">top 5</option>
+          <option value="11">top 10</option>
+          <option value="21">top 20</option>
+        </select>
+            
+    </div>
+    
+    
+    
+      <div id="body" style="height: 1200px">
+          <div id="donut">
+              <div id="chart" style="position: initial;"></div> 
+          </div>
+      </div>
+     
+      <script type="text/javascript" src="script.js"></script>
+      <script>
+	
+		////////////////////////////////////////////////////////////
+		//////////////////////// Set-up ////////////////////////////
+		////////////////////////////////////////////////////////////
+
+		
+					
+		
+
+		
+	
+	</script>
+
+  </body>
+</html>
