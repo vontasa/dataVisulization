@@ -35,6 +35,7 @@ var xz = d3.range(m),
     yMax = d3.max(yz, function(y) { return d3.max(y); }),
     y1Max = d3.max(y01z, function(y) { return d3.max(y, function(d) { return d[1]; }); });
 
+// Select the componenet and create d3 objext
 var svg = d3.select("svg"),
     margin = {top: 40, right: 10, bottom: 20, left: 10},
     width = +svg.attr("width") - margin.left - margin.right,
