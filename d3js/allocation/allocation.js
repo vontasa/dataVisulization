@@ -1,4 +1,6 @@
-	
+
+
+/*****Setup D3js *******/
 var width = 960,
     height = 500;
 
