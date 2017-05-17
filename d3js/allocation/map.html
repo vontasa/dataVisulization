@@ -3,43 +3,48 @@
 <head>
 	<title>d3.js with leaflet.js</title>
 
-    <link 
-        rel="stylesheet" 
-        href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css"
-    />
-    <script src="http://d3js.org/d3.v3.min.js"></script>
-
-    <script
-        src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js">
-    </script>
+    
+    <script src="http://d3js.org/d3.v4.min.js"></script>
+    <script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"></script>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css"/>
+    <!--Customized CSS-->
+    <style>
+    .hull {
+        fill: steelblue;
+        stroke: steelblue;
+        stroke-width: 32px;
+        stroke-linejoin: round;
+    }
+    </style>
     
 </head>
 <body>
-	<div id="map" style="width: 600px; height: 400px"></div>
+	<div id="map" style="width: 1200px; height: 768px"></div>
 	<script type="text/javascript">
-        var map = L.map('map').setView([-41.2858, 174.7868], 13);
+        var map = L.map('map').setView([42.877742, -97.380979], 4);
         mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
         L.tileLayer(
             'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; ' + mapLink + ' Contributors',
             maxZoom: 18,
             }).addTo(map);
-            // Sales reps locations
+        // Sales reps locations
         var reps = {"objects":[
-            {"circle":{"coordinates":[-41.28,174.77]}},
-            {"circle":{"coordinates":[-41.29,174.76]}},
-            {"circle":{"coordinates":[-41.30,174.79]}},
-            {"circle":{"coordinates":[-41.27,174.80]}},
-            {"circle":{"coordinates":[-41.29,174.78]}}
+            {"circle":{"coordinates":[28.2949, -80.666]}},
+            {"circle":{"coordinates":[26.34275055, -81.31328583]}},
+            {"circle":{"coordinates":[39.530895, -119.814972]}},
+            {"circle":{"coordinates":[39.95080566,-105.1594925]}},
+            {"circle":{"coordinates":[42.51844406,-87.9826355]}}
             ]
         }			
+
 	/* Initialize the SVG layer */
 	map._initPathRoot()
     
 	/* We simply pick up the SVG from the map object */
 	var svg = d3.select("#map").select("svg"),
 	g = svg.append("g");
-	console.log(reps);
+	console.log(reps.objects[1]);
     /* Add a LatLng object to each item in the dataset */
     reps.objects.forEach(function(d) {
         d.LatLng = new L.LatLng(d.circle.coordinates[0],
@@ -48,24 +53,74 @@
     
     var feature = g.selectAll("circle")
         .data(reps.objects)
-        .enter().append("circle")
-        .style("stroke", "black")  
+        .enter()
+        .append("circle")
+        .attr("class", "dot")
         .style("opacity", .6) 
         .style("fill", "red")
-        .attr("r", 20);  
-    
+        .attr("r", 5); 
+    var transform = d3.geoTransform({point: projectPoint}),
+        path = d3.geoPath().projection(transform);
+    var featureHull =  svg.selectAll("path")
+        .data(d3.polygonHull(reps.objects))
+        .enter()
+        .append("path")
+        .attr("stroke", "gray")
+        .attr("fill", "green")
+        .attr("fill-opacity", 0.6)
+
+    setInterval(transition, 750)
     map.on("viewreset", update);
     update();
-
+    //drawhull();
+    
+    
+    function projectPoint(x, y) {
+        var point = map.latLngToLayerPoint(new L.LatLng(y, x));
+        this.stream.point(point.x, point.y);
+    }
+    function drawhull(){
+        console.log(d3.polygonHull(reps.objects));
+        svg.append("path")
+            .attr("fill", "red")
+            .attr("d", d3.geoPath(d3.polygonHull(reps.objects)));
+    }
     function update() {
-        feature.attr("transform", 
-        function(d) { 
+        feature.attr("transform", function(d) { 
             return "translate("+ 
                 map.latLngToLayerPoint(d.LatLng).x +","+ 
                 map.latLngToLayerPoint(d.LatLng).y +")";
-            }
-        )
+        });
+        featureHull.attr("d", path)
+
     }
+    function transition(){
+        svg
+        .selectAll("ring")
+        .data(reps.objects)
+        .enter()
+        .append("circle")
+        // Using filter to select a specific element
+        .filter(function(d,i){return i===2;})
+            .attr("class", "ring")
+            .attr("transform", function(d) { 
+                return "translate("+ 
+                    map.latLngToLayerPoint(d.LatLng).x +","+ 
+                    map.latLngToLayerPoint(d.LatLng).y +")";})
+            .attr("r", 6)
+            .style("stroke-width", 1)
+            .style("stroke", "red")
+            .style("fill", "none")
+        .transition()
+            .ease(d3.easeLinear)
+            .duration(2000) // Change Speed
+            .style("stroke-opacity", 1e-6)
+            .style("stroke-width", 1)
+            .style("stroke", "red")
+            .attr("r", 30)
+            .remove();
+    }
+
 
 </script>
 </body>
