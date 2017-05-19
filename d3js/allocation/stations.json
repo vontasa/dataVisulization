@@ -1,0 +1,73 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Rep 1",
+        "marker-color": "#0000ff",
+        "marker-symbol": "rail-metro",
+        "line": "blue"
+      },
+      
+      "geometry": {
+        "type": "Point",
+        "coordinates": [26.34275055, -81.31328583]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Rep 2",
+        "marker-color": "#0000ff",
+        "marker-symbol": "rail-metro",
+        "line": "blue"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [39.530895, -119.814972]
+      }
+    },
+
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Rep 3",
+        "marker-color": "#0000ff",
+        "marker-symbol": "rail-metro",
+        "line": "blue"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [39.95080566,-105.1594925]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Rep 4",
+        "marker-color": "#ff0000",
+        "marker-symbol": "rail-metro",
+        "line": "red"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [42.51844406,-87.9826355]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Rep 5",
+        "marker-color": "#0000ff",
+        "marker-symbol": "rail-metro",
+        "line": "blue"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [28.2949, -80.666]
+      }
+    }
+  ]
+}
