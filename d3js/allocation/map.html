@@ -102,6 +102,17 @@
         "coordinates": [28.2949, -80.666]
       }
     }
+    /*
+    -78.78852844	35.76341248
+-73.31693268	40.86263275
+-92.19317627	29.89461136
+-97.14483643	32.57073975
+-87.9506073	42.29540634
+-116.4317551	43.64958572
+-70.82943726	42.97993469
+-71.17945862	42.24687195
+
+    */
   ]
 };	
 
@@ -114,7 +125,7 @@
     reps.features.forEach(function(d) {
         d.LatLng = new L.LatLng(d.geometry.coordinates[0],
                                 d.geometry.coordinates[1]);
-        p.push([d.geometry.coordinates[1],d.geometry.coordinates[0]]);
+        p.push([d.geometry.coordinates[0],d.geometry.coordinates[1]]);
     })
 
     var states = [{
@@ -171,8 +182,9 @@
     update();
 
     // Add polygon to map
-    //var polygon = L.polygon(d3.polygonHull(p)).addTo(map);
-    var polygon =L.geoJson(states).addTo(map);
+    var polygon = L.polygon(d3.polygonHull(p)).addTo(map);
+    // Using geo json to draw polygon 
+    //var polygon =L.geoJson(states).addTo(map);
 
     function pointsToPolygon(){
         console.log(d3.polygonHull(reps.features));
