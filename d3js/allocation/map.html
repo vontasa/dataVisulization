@@ -5,15 +5,16 @@
 
     
     <script src="http://d3js.org/d3.v4.min.js"></script>
-    <script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"></script>
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"/>
     <!--Customized CSS-->
     <style>
     .hull {
         fill: steelblue;
         stroke: steelblue;
-        stroke-width: 32px;
+        stroke-width: 16px;
         stroke-linejoin: round;
+        opacity: 0.5
     }
     </style>
     
@@ -28,7 +29,7 @@
             attribution: '&copy; ' + mapLink + ' Contributors',
             maxZoom: 18,
             }).addTo(map);
-	    map._initPathRoot()
+        L.svg({clickable:true}).addTo(map);	
 
         // Sales reps locations
         var reps = {
@@ -73,27 +74,29 @@
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [39.95080566,-105.1594925]
+        "coordinates": [42.51844406, -87.9826355]
       }
     },
+ 
     {
       "type": "Feature",
       "properties": {
         "name": "Rep 4",
-        "marker-color": "#ff0000",
+        "marker-color": "#0000ff",
         "marker-symbol": "rail-metro",
-        "line": "red"
+        "line": "blue"
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [42.51844406,-87.9826355]
+        "coordinates": [39.95080566, -105.1594925]
       }
     },
+  
     {
       "type": "Feature",
       "properties": {
         "name": "Rep 5",
-        "marker-color": "#0000ff",
+        "marker-color": "#ff0000",
         "marker-symbol": "rail-metro",
         "line": "blue"
       },
@@ -101,23 +104,81 @@
         "type": "Point",
         "coordinates": [28.2949, -80.666]
       }
-    }
-    /*
-    -78.78852844	35.76341248
--73.31693268	40.86263275
--92.19317627	29.89461136
--97.14483643	32.57073975
--87.9506073	42.29540634
--116.4317551	43.64958572
--70.82943726	42.97993469
--71.17945862	42.24687195
-
-    */
+    },
+    
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Rep 6",
+        "marker-color": "#0000ff",
+        "marker-symbol": "rail-metro",
+        "line": "blue"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [35.76341248, -78.78852844]
+      }
+    },
+    
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Rep 7",
+        "marker-color": "#0000ff",
+        "marker-symbol": "rail-metro",
+        "line": "blue"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [40.86263275, -73.31693268]
+      }
+    },
+    
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Rep 8",
+        "marker-color": "#0000ff",
+        "marker-symbol": "rail-metro",
+        "line": "blue"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [29.89461136, -92.19317627]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Rep 9",
+        "marker-color": "#0000ff",
+        "marker-symbol": "rail-metro",
+        "line": "blue"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.57073975, -97.14483643]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Rep 10",
+        "marker-color": "#0000ff",
+        "marker-symbol": "rail-metro",
+        "line": "blue"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [42.29540634, -87.9506073]
+      }
+    },
   ]
 };	
 
 	/* We simply pick up the SVG from the map object */
-	var svg = d3.select("#map").select("svg"),
+	var svg = d3.select("#map").select("svg")
+    .attr("pointer-events", "auto");
 	g = svg.append("g");
 
     /* Add a LatLng object to each item in the dataset */
@@ -128,29 +189,32 @@
         p.push([d.geometry.coordinates[0],d.geometry.coordinates[1]]);
     })
 
+    test = [[
+            [42.51844406, -87.9826355],
+            [39.530895, -119.814972],
+            [29.89461136, -92.19317627],
+            [26.34275055, -81.31328583],
+            [40.86263275, -73.31693268],
+            ]
+        ]
     var states = [{
-    "type": "Feature",
-    "properties": {"party": "Republican"},
-    "geometry": {
-        "type": "Polygon",
-        "coordinates": [p]
-    }
-}, {
-    "type": "Feature",
-    "properties": {"party": "Democrat"},
-    "geometry": {
-        "type": "Polygon",
-        "coordinates": [[
-            [-109.05, 41.00],
-            [-102.06, 40.99],
-            [-102.03, 36.99],
-            [-109.04, 36.99],
-            [-109.05, 41.00]
-        ]]
-    }
-}];
-    console.log(p)
-    console.log(states)
+        "type": "Feature",
+        "properties": {"party": "Republican"},
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": test
+        }
+    },
+    {
+        "type": "Feature",
+        "properties": {"party": "123"},
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [p]
+        }
+    },
+];
+    console.log(d3.polygonHull(p))
     var feature = g.selectAll("circle")
         .data(reps.features)
         .enter()
@@ -167,31 +231,24 @@
 
     var transform = d3.geoTransform({point: projectPoint});
     var path = d3.geoPath().projection(transform);
-
+    // Draw the convex hull
     var featureHull =  svg.selectAll("path")
-        .data(d3.polygonHull(reps.features))
+        .data(states)
         .enter()
         .append("path")
-        .attr("stroke", "gray")
-        .attr("fill", "green")
-        .attr("fill-opacity", 0.6)
-
-    setInterval(transition, 750)
-    map.on("viewreset", update);
-    featureHull.attr("d", path)
+        .attr("class", "hull")
+    blink = 0;
+    setInterval(transition, 750);
+    setInterval(script, 3000);
+    map.on("moveend", update);
     update();
+    featureHull.attr("d", path)
 
     // Add polygon to map
-    var polygon = L.polygon(d3.polygonHull(p)).addTo(map);
+    //var polygon = L.polygon(test).addTo(map);
+    console.log(d3.polygonHull(p))
     // Using geo json to draw polygon 
-    //var polygon =L.geoJson(states).addTo(map);
-
-    function pointsToPolygon(){
-        console.log(d3.polygonHull(reps.features));
-        svg.append("path")
-            .attr("fill", "red")
-            .attr("d", d3.geoPath(d3.polygonHull(feature)));
-    }
+    var polygon =L.geoJson(states).addTo(map);
     function update() {
         feature.attr("transform", function(d) { 
             return "translate("+ 
@@ -201,6 +258,19 @@
         featureHull.attr("d", path)
 
     }
+    function script(){
+        // Rep blinking
+        blink = Math.floor(Math.random() * 4)
+        // change 
+        var end = Math.max(3,Math.floor(Math.random()*p.length)+1);
+        var newPoints = p.slice(0, end);//
+        console.log(end)
+        var newHull = d3.polygonHull(newPoints)
+        console.log(newPoints)
+        polygon.remove();
+        states[1].geometry.coordinates = [newHull];
+        L.geoJson(states).addTo(map);
+    }
     function transition(){
         svg
         .selectAll("ring")
@@ -208,7 +278,7 @@
         .enter()
         .append("circle")
         // Using filter to select a specific element
-        .filter(function(d,i){return i===2;})
+        .filter(function(d,i){return i===blink;})
             .attr("class", "ring")
             .attr("transform", function(d) { 
                 return "translate("+ 
@@ -218,13 +288,14 @@
             .style("stroke-width", 1)
             .style("stroke", "red")
             .style("fill", "none")
+
         .transition()
             .ease(d3.easeLinear)
             .duration(2000) // Change Speed
             .style("stroke-opacity", 1e-6)
-            .style("stroke-width", 1)
+            .style("stroke-width", 3)
             .style("stroke", "red")
-            .attr("r", 30)
+            .attr("r", 35)
             .remove();
     }
 
