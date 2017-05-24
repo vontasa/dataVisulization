@@ -16,11 +16,26 @@
         stroke-linejoin: round;
         opacity: 0.5
     }
+    .group.a { fill: #FF5252; stroke: #FF5252;stroke-width: 16px;stroke-linejoin: round;opacity: 0.5}
+    .group.b { fill: #673AB7; stroke: #673AB7;stroke-width: 16px;stroke-linejoin: round;opacity: 0.5}
+    .group.c { fill: #42A5F5; stroke: #42A5F5;stroke-width: 16px;stroke-linejoin: round;opacity: 0.5}
+    .group.d { fill: #009688; stroke: #009688;stroke-width: 16px;stroke-linejoin: round;opacity: 0.5}
+    .group.e { fill: #C0CA33; stroke: #C0CA33;stroke-width: 16px;stroke-linejoin: round;opacity: 0.5}
+
+    .place-label {
+        fill: black;
+        fill-opacity: .8;
+        font-size: 20px;
+        font-weight: 300;
+        text-anchor: middle;
+    }
     </style>
-    
 </head>
 <body>
-	<div id="map" style="width: 1200px; height: 768px"></div>
+    <div id="Panel">
+        <h1>Territory Allocation Demo</h1>
+    </div>
+	<div id="map" style="width: 1024px; height: 600px"></div>
 	<script type="text/javascript">
         var map = L.map('map').setView([42.877742, -97.380979], 4);
         mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
@@ -39,11 +54,8 @@
       "type": "Feature",
       "properties": {
         "name": "Rep 1",
-        "marker-color": "#0000ff",
-        "marker-symbol": "rail-metro",
-        "line": "blue"
+        "group": "a",
       },
-      
       "geometry": {
         "type": "Point",
         "coordinates": [26.34275055, -81.31328583]
@@ -54,9 +66,7 @@
       "type": "Feature",
       "properties": {
         "name": "Rep 2",
-        "marker-color": "#0000ff",
-        "marker-symbol": "rail-metro",
-        "line": "blue"
+        "group": "a",
       },
       "geometry": {
         "type": "Point",
@@ -68,9 +78,7 @@
       "type": "Feature",
       "properties": {
         "name": "Rep 3",
-        "marker-color": "#0000ff",
-        "marker-symbol": "rail-metro",
-        "line": "blue"
+        "group": "a",
       },
       "geometry": {
         "type": "Point",
@@ -82,9 +90,7 @@
       "type": "Feature",
       "properties": {
         "name": "Rep 4",
-        "marker-color": "#0000ff",
-        "marker-symbol": "rail-metro",
-        "line": "blue"
+        "group": "a",
       },
       "geometry": {
         "type": "Point",
@@ -96,9 +102,7 @@
       "type": "Feature",
       "properties": {
         "name": "Rep 5",
-        "marker-color": "#ff0000",
-        "marker-symbol": "rail-metro",
-        "line": "blue"
+        "group": "a",
       },
       "geometry": {
         "type": "Point",
@@ -110,9 +114,7 @@
       "type": "Feature",
       "properties": {
         "name": "Rep 6",
-        "marker-color": "#0000ff",
-        "marker-symbol": "rail-metro",
-        "line": "blue"
+        "group": "b",
       },
       "geometry": {
         "type": "Point",
@@ -124,9 +126,7 @@
       "type": "Feature",
       "properties": {
         "name": "Rep 7",
-        "marker-color": "#0000ff",
-        "marker-symbol": "rail-metro",
-        "line": "blue"
+        "group": "b",
       },
       "geometry": {
         "type": "Point",
@@ -138,9 +138,7 @@
       "type": "Feature",
       "properties": {
         "name": "Rep 8",
-        "marker-color": "#0000ff",
-        "marker-symbol": "rail-metro",
-        "line": "blue"
+        "group": "b",
       },
       "geometry": {
         "type": "Point",
@@ -151,9 +149,7 @@
       "type": "Feature",
       "properties": {
         "name": "Rep 9",
-        "marker-color": "#0000ff",
-        "marker-symbol": "rail-metro",
-        "line": "blue"
+        "group": "b",
       },
       "geometry": {
         "type": "Point",
@@ -164,9 +160,7 @@
       "type": "Feature",
       "properties": {
         "name": "Rep 10",
-        "marker-color": "#0000ff",
-        "marker-symbol": "rail-metro",
-        "line": "blue"
+        "group": "b",
       },
       "geometry": {
         "type": "Point",
@@ -174,19 +168,6 @@
       }
     },
 
-    {
-      "type": "Feature",
-      "properties": {
-        "name": "Rep fake",
-        "marker-color": "#0000ff",
-        "marker-symbol": "rail-metro",
-        "line": "blue"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [42.29540634, -87.9506073]
-      }
-    },
   ]
 };	
 
@@ -203,83 +184,153 @@
         p.push([d.geometry.coordinates[0],d.geometry.coordinates[1]]);
     })
 
-    test =  d3.polygonHull(p);
-    test.push([]);
-    console.log(test)
+
     var states = [  
       {
         "type": "Feature",
-        "properties": {"party": "Republican"},
+        "properties": {"id":"a"},
         "geometry": {
             "type": "Polygon",
-            "coordinates": [test]
+            "coordinates": [],
+            "points":[]
+        }
+    },
+
+    {
+        "type": "Feature",
+        "properties": {"id":"b"},
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [],
+            "points":[]
         }
     }
 ];
+    function getHull(){
+        // Clean all points in states
+        states.forEach(function(e){e.geometry.points=[];});
+        // Assign poitns
+        reps.features.forEach(function(d) {
+            var target = states.find(function(g){
+                return g.properties.id===d.properties.group
+            })
+            target.geometry.points.push([d.geometry.coordinates[0],d.geometry.coordinates[1]]);
+        })
+        //Calculate hull
+        states.forEach(function(e){
+            var hull =  d3.polygonHull(e.geometry.points);
+            hull.push([]);
+            e.geometry.coordinates = [hull];});
+    }
+    
+
+    function projectPoint(x, y) {
+        var point = map.latLngToLayerPoint(new L.LatLng(x, y));
+        this.stream.point(point.x, point.y);
+    }
+
+    var transform = d3.geoTransform({point: projectPoint});
+    var path = d3.geoPath().projection(transform);
+    var story = [
+            {"point":0, "from":"a", "to":"b"},
+            {"point":9, "from":"b", "to":"a"},
+            {"point":8, "from":"b", "to":"a"},
+            {"point":0, "from":"b", "to":"a"},
+            {"point":9, "from":"a", "to":"b"},
+            {"point":8, "from":"a", "to":"b"},
+            ]
+    var index = 0;
+    var blink = story[index].point;
+    // Draw the convex hull
+    var featureHull =  svg.selectAll("path")
+        .data(states)
+        .enter()
+        .append("path")
+        .attr("class", function(d){return "group "+d.properties.id})
+        
 
     var feature = g.selectAll("circle")
         .data(reps.features)
         .enter()
         .append("circle")
         .attr("class", "dot")
-        .style("opacity", .6) 
+        .style("opacity", .9) 
         .style("fill", "red")
-        .attr("r", 5);
+        .style("stroke","black")
+        .attr("r", 6)
 
-    function projectPoint(x, y) {
-        var point = map.latLngToLayerPoint(new L.LatLng(x, y));
-        console.log('x: '+x+', y: '+y);
-        console.log(point);
-        this.stream.point(point.x, point.y);
-    }
+    var featureLabel = svg.selectAll(".place-label")
+            .data(reps.features)
+           
+    var blinkRing = svg.selectAll("ring")
+        .data(reps.features);
 
-    var transform = d3.geoTransform({point: projectPoint});
-    var path = d3.geoPath().projection(transform);
-    // Draw the convex hull
-    var featureHull =  svg.selectAll("path")
-        .data(states)
-        .enter()
-        .append("path")
-        .attr("class", "hull")
-    blink = 0;
-    setInterval(transition, 750);
-    //setInterval(script, 3000);
+
+    getHull();
+    var blinkingID = setInterval(transition, 300);
+    var storyTransitionID = setInterval(script, 3000);
     map.on("moveend", update);
+    map.on('zoomend', update);
     update();
 
-    // Add polygon to map
-    //var polygon = L.polygon(test).addTo(map);
-    // Using geo json to draw polygon 
-   // var polygon =L.geoJson(states).addTo(map);
     function update() {
+        featureHull.attr("d", path)
+
         feature.attr("transform", function(d) { 
             return "translate("+ 
                 map.latLngToLayerPoint(d.LatLng).x +","+ 
                 map.latLngToLayerPoint(d.LatLng).y +")";
         });
-        featureHull.attr("d", path)
 
+        featureLabel.filter(function(d,i){return i===blink;})
+        .attr("transform", function(d) { 
+            return "translate(" + 
+                (map.latLngToLayerPoint(d.LatLng).x+10) +","+ 
+                (map.latLngToLayerPoint(d.LatLng).y-10) +")";
+        })
+            //.attr("dy", ".35em")
+            .text(function(d) { return d.properties.name; }); 
     }
+
+
 
     function script(){
-        // Rep blinking
-        blink = Math.floor(Math.random() * 4)
-        // change 
-        var end = Math.max(3,Math.floor(Math.random()*p.length)+1);
-        var newPoints = p.slice(0, end);//
-        console.log(end)
-        var newHull = d3.polygonHull(newPoints)
-        console.log(newPoints)
-        polygon.remove();
-        states[1].geometry.coordinates = [newHull];
-       // L.geoJson(states).addTo(map);
-        polygon = L.polygon(test).addTo(map);
+        // Blinking point id
+        blink = story[index].point;
+        // Change the group
+        reps.features[blink].properties.group = story[index].to;
+        // Update the convex hull
+        getHull()
+
+        featureLabel.enter()
+            .append("text")
+            .attr("class", "place-label")
+            .filter(function(d,i){return i===blink;})
+            .attr("transform", function(d) { 
+            return "translate(" + 
+                (map.latLngToLayerPoint(d.LatLng).x) +","+ 
+                (map.latLngToLayerPoint(d.LatLng).y-20) +")";
+            })
+            .attr("dy", ".35em")
+            .text(function(d) {return d.properties.name; })
+            .transition()
+            .duration(3000)
+            .remove();
+
+        // draw hull
+        featureHull.data(states)
+        .transition()
+            .delay(3000)
+            .duration(1000)
+            .attr("d", path)
+        // update the story
+        console.log(index)
+        index = index==(story.length-1)?0:(index+1);
+        
+        update();
     }
     function transition(){
-        svg
-        .selectAll("ring")
-        .data(reps.features)
-        .enter()
+        blinkRing.enter()
         .append("circle")
         // Using filter to select a specific element
         .filter(function(d,i){return i===blink;})
@@ -292,10 +343,9 @@
             .style("stroke-width", 1)
             .style("stroke", "red")
             .style("fill", "none")
-
         .transition()
             .ease(d3.easeLinear)
-            .duration(2000) // Change Speed
+            .duration(1000) // Change Speed
             .style("stroke-opacity", 1e-6)
             .style("stroke-width", 3)
             .style("stroke", "red")
