@@ -173,6 +173,20 @@
         "coordinates": [42.29540634, -87.9506073]
       }
     },
+
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Rep fake",
+        "marker-color": "#0000ff",
+        "marker-symbol": "rail-metro",
+        "line": "blue"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [42.29540634, -87.9506073]
+      }
+    },
   ]
 };	
 
@@ -189,32 +203,20 @@
         p.push([d.geometry.coordinates[0],d.geometry.coordinates[1]]);
     })
 
-    test = [[
-            [42.51844406, -87.9826355],
-            [39.530895, -119.814972],
-            [29.89461136, -92.19317627],
-            [26.34275055, -81.31328583],
-            [40.86263275, -73.31693268],
-            ]
-        ]
-    var states = [{
+    test =  d3.polygonHull(p);
+    test.push([]);
+    console.log(test)
+    var states = [  
+      {
         "type": "Feature",
         "properties": {"party": "Republican"},
         "geometry": {
             "type": "Polygon",
-            "coordinates": test
+            "coordinates": [test]
         }
-    },
-    {
-        "type": "Feature",
-        "properties": {"party": "123"},
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": [p]
-        }
-    },
+    }
 ];
-    console.log(d3.polygonHull(p))
+
     var feature = g.selectAll("circle")
         .data(reps.features)
         .enter()
@@ -226,6 +228,8 @@
 
     function projectPoint(x, y) {
         var point = map.latLngToLayerPoint(new L.LatLng(x, y));
+        console.log('x: '+x+', y: '+y);
+        console.log(point);
         this.stream.point(point.x, point.y);
     }
 
@@ -239,16 +243,14 @@
         .attr("class", "hull")
     blink = 0;
     setInterval(transition, 750);
-    setInterval(script, 3000);
+    //setInterval(script, 3000);
     map.on("moveend", update);
     update();
-    featureHull.attr("d", path)
 
     // Add polygon to map
     //var polygon = L.polygon(test).addTo(map);
-    console.log(d3.polygonHull(p))
     // Using geo json to draw polygon 
-    var polygon =L.geoJson(states).addTo(map);
+   // var polygon =L.geoJson(states).addTo(map);
     function update() {
         feature.attr("transform", function(d) { 
             return "translate("+ 
@@ -258,6 +260,7 @@
         featureHull.attr("d", path)
 
     }
+
     function script(){
         // Rep blinking
         blink = Math.floor(Math.random() * 4)
@@ -269,7 +272,8 @@
         console.log(newPoints)
         polygon.remove();
         states[1].geometry.coordinates = [newHull];
-        L.geoJson(states).addTo(map);
+       // L.geoJson(states).addTo(map);
+        polygon = L.polygon(test).addTo(map);
     }
     function transition(){
         svg
