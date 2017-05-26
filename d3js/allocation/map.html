@@ -55,6 +55,7 @@
       "properties": {
         "name": "Rep 1",
         "group": "a",
+        "score":100,
       },
       "geometry": {
         "type": "Point",
@@ -67,6 +68,7 @@
       "properties": {
         "name": "Rep 2",
         "group": "a",
+        "score":100,
       },
       "geometry": {
         "type": "Point",
@@ -79,6 +81,7 @@
       "properties": {
         "name": "Rep 3",
         "group": "a",
+        "score":100,
       },
       "geometry": {
         "type": "Point",
@@ -91,6 +94,7 @@
       "properties": {
         "name": "Rep 4",
         "group": "a",
+        "score":100,
       },
       "geometry": {
         "type": "Point",
@@ -103,6 +107,7 @@
       "properties": {
         "name": "Rep 5",
         "group": "a",
+        "score":100,
       },
       "geometry": {
         "type": "Point",
@@ -115,6 +120,7 @@
       "properties": {
         "name": "Rep 6",
         "group": "b",
+        "score":100,
       },
       "geometry": {
         "type": "Point",
@@ -127,6 +133,7 @@
       "properties": {
         "name": "Rep 7",
         "group": "b",
+        "score":100,
       },
       "geometry": {
         "type": "Point",
@@ -139,6 +146,7 @@
       "properties": {
         "name": "Rep 8",
         "group": "b",
+        "score":100,
       },
       "geometry": {
         "type": "Point",
@@ -150,6 +158,7 @@
       "properties": {
         "name": "Rep 9",
         "group": "b",
+        "score":100,
       },
       "geometry": {
         "type": "Point",
@@ -161,6 +170,7 @@
       "properties": {
         "name": "Rep 10",
         "group": "b",
+        "score":100,
       },
       "geometry": {
         "type": "Point",
@@ -206,6 +216,15 @@
         }
     }
 ];
+
+    var story = [
+        {"point":0, "from":"a", "to":"b"},
+        {"point":9, "from":"b", "to":"a"},
+        {"point":8, "from":"b", "to":"a"},
+        {"point":0, "from":"b", "to":"a"},
+        {"point":9, "from":"a", "to":"b"},
+        {"point":8, "from":"a", "to":"b"},
+    ];
     function getHull(){
         // Clean all points in states
         states.forEach(function(e){e.geometry.points=[];});
@@ -231,14 +250,7 @@
 
     var transform = d3.geoTransform({point: projectPoint});
     var path = d3.geoPath().projection(transform);
-    var story = [
-            {"point":0, "from":"a", "to":"b"},
-            {"point":9, "from":"b", "to":"a"},
-            {"point":8, "from":"b", "to":"a"},
-            {"point":0, "from":"b", "to":"a"},
-            {"point":9, "from":"a", "to":"b"},
-            {"point":8, "from":"a", "to":"b"},
-            ]
+
     var index = 0;
     var blink = story[index].point;
     // Draw the convex hull
