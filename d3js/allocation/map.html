@@ -5,6 +5,7 @@
 
     
     <script src="http://d3js.org/d3.v4.min.js"></script>
+
     <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"/>
     <!--Customized CSS-->
@@ -29,27 +30,108 @@
         font-weight: 300;
         text-anchor: middle;
     }
+
+    .container {
+      width: 100px;
+      margin: 0 auto;
+    }
+
+    .button {
+        padding: 0;
+        width: 100px;
+        height: 100px;
+        border: 0;
+        background-color: white;
+        outline: none;
+    }
     </style>
 </head>
 <body>
     <div id="Panel">
         <h1>Territory Allocation Demo</h1>
+        
+        <button id="pre" type="button" onclick="previous()">Previous</button>
+        
+        <button id="play" class="button js-button">
+            <svg viewBox="0 0 36 36" >
+                <defs>
+                    <path id="pause-icon" data-state="playing" d="M11,10 L17,10 17,26 11,26 M20,10 L26,10 26,26 20,26" />
+                    <path id="play-icon"  data-state="paused"  d="M11,10 L18,13.74 18,22.28 11,26 M18,13.74 L26,18 26,18 18,22.28" />
+                </defs>
+                <use xlink:href="#play-icon" />
+            </svg>
+        </button>
+
+
     </div>
 	<div id="map" style="width: 1024px; height: 600px"></div>
 	<script type="text/javascript">
-        var map = L.map('map').setView([42.877742, -97.380979], 4);
-        mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
-        L.tileLayer(
-            'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; ' + mapLink + ' Contributors',
-            maxZoom: 18,
-            }).addTo(map);
-        L.svg({clickable:true}).addTo(map);	
+    var playButton = {
+        el: document.querySelector(".js-button"),
+        states: {
+            playing: {
+                nextState: "paused",
+                iconEl: document.querySelector("#pause-icon")
+            },
+            paused:  {
+                nextState: "playing",
+                iconEl: document.querySelector("#play-icon")
+            }
+        },
 
-        // Sales reps locations
-        var reps = {
-  "type": "FeatureCollection",
-  "features": [
+        animationDuration: 350,
+
+        init: function () {
+            this.setInitialState();
+            this.replaceUseEl();
+            this.el.addEventListener("click", this.goToNextState.bind(this));
+        },
+
+        setInitialState: function () {
+          var initialIconRef = this.el.querySelector("use").getAttribute("xlink:href");
+          var stateName = this.el.querySelector(initialIconRef).getAttribute("data-state");
+          this.setState(stateName);
+        },
+
+        replaceUseEl: function () {
+            d3.select(this.el.querySelector("use")).remove();
+            d3.select(this.el.querySelector("svg")).append("path")
+                .attr("class", "js-icon")
+                .attr("d", this.stateIconPath());
+        },
+
+        goToNextState: function () {
+            this.setState(this.state.nextState);
+
+            d3.select(this.el.querySelector(".js-icon")).transition()
+                .duration(this.animationDuration)
+                .attr("d", this.stateIconPath());
+        },
+
+        setState: function (stateName) {
+            this.state = this.states[stateName];
+        },
+
+        stateIconPath: function () {
+            return this.state.iconEl.getAttribute("d");
+        }
+    };
+
+    playButton.init();
+    var map = L.map('map').setView([42.877742, -97.380979], 4);
+    mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
+    L.tileLayer(
+        'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; ' + mapLink + ' Contributors',
+        maxZoom: 18,
+        }).addTo(map);
+    L.svg({clickable:true}).addTo(map);	
+
+    // Sales reps locations
+
+    var reps = {
+    "type": "FeatureCollection",
+    "features": [
     {
       "type": "Feature",
       "properties": {
@@ -187,34 +269,35 @@
 	g = svg.append("g");
 
     /* Add a LatLng object to each item in the dataset */
-    var p=[]
-    reps.features.forEach(function(d) {
-        d.LatLng = new L.LatLng(d.geometry.coordinates[0],
-                                d.geometry.coordinates[1]);
-        p.push([d.geometry.coordinates[0],d.geometry.coordinates[1]]);
-    })
+  var p=[]
+  reps.features.forEach(function(d) {
+      d.LatLng = new L.LatLng(d.geometry.coordinates[0],
+                              d.geometry.coordinates[1]);
+      p.push([d.geometry.coordinates[0],d.geometry.coordinates[1]]);
+  })
 
 
-    var states = [  
-      {
-        "type": "Feature",
-        "properties": {"id":"a"},
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": [],
-            "points":[]
-        }
-    },
 
+  var states = [  
     {
-        "type": "Feature",
-        "properties": {"id":"b"},
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": [],
-            "points":[]
-        }
-    }
+      "type": "Feature",
+      "properties": {"id":"a"},
+      "geometry": {
+          "type": "Polygon",
+          "coordinates": [],
+          "points":[]
+      }
+  },
+
+  {
+      "type": "Feature",
+      "properties": {"id":"b"},
+      "geometry": {
+          "type": "Polygon",
+          "coordinates": [],
+          "points":[]
+      }
+  }
 ];
 
     var story = [
@@ -277,10 +360,25 @@
     var blinkRing = svg.selectAll("ring")
         .data(reps.features);
 
-
+// Start the main process
     getHull();
-    var blinkingID = setInterval(transition, 300);
-    var storyTransitionID = setInterval(script, 3000);
+    var blinkingID;
+    var storyTransitionID;
+    d3.select("#play")
+      //.text("Play")
+      .on("click",function(){
+          var self = d3.select(this);
+          if (playButton.state.nextState=="paused"){
+            console.log(playButton.state.nextState);
+            blinkingID = setInterval(transition, 300);
+            storyTransitionID = setInterval(script, 3000);
+          }else{
+            console.log(playButton.state.nextState);
+            clearInterval(storyTransitionID);
+            clearInterval(blinkingID);
+          }
+          d3.select("text").text("Step:");
+    });//end click function
     map.on("moveend", update);
     map.on('zoomend', update);
     update();
@@ -301,10 +399,8 @@
                 (map.latLngToLayerPoint(d.LatLng).y-10) +")";
         })
             //.attr("dy", ".35em")
-            .text(function(d) { return d.properties.name; }); 
+            .text(function(d) { return "Next: "+d.properties.name; }); 
     }
-
-
 
     function script(){
         // Blinking point id
@@ -338,7 +434,6 @@
         // update the story
         console.log(index)
         index = index==(story.length-1)?0:(index+1);
-        
         update();
     }
     function transition(){
@@ -363,6 +458,19 @@
             .style("stroke", "red")
             .attr("r", 35)
             .remove();
+    }
+    function previous(){
+      if(index>=2){
+        index = index-2;
+      }
+      else{
+        index = story.length-2
+      }
+      script();
+      update();
+    }
+    function next(){
+
     }
 
 
