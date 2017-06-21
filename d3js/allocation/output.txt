@@ -1,159 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>d3.js with leaflet.js</title>
-
-    
-    <script src="http://d3js.org/d3.v4.min.js"></script>
-
-    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"/>
-    <!--Customized CSS-->
-    <style>
-    .hull {
-        fill: steelblue;
-        stroke: steelblue;
-        stroke-width: 16px;
-        stroke-linejoin: round;
-        opacity: 0.5
-    }
-    .group.RD-1 { fill: #FF5252; stroke: #FF5252;stroke-width: 16px;stroke-linejoin: round;opacity: 0.5}
-    .group.RD-2 { fill: #673AB7; stroke: #673AB7;stroke-width: 16px;stroke-linejoin: round;opacity: 0.5}
-    .group.RD-3 { fill: #42A5F5; stroke: #42A5F5;stroke-width: 16px;stroke-linejoin: round;opacity: 0.5}
-    .group.RD-4 { fill: #009688; stroke: #009688;stroke-width: 16px;stroke-linejoin: round;opacity: 0.5}
-    .group.RD-5 { fill: #C0CA33; stroke: #C0CA33;stroke-width: 16px;stroke-linejoin: round;opacity: 0.5}
-
-    .group.RD-6 { fill: #3366cc; stroke: #3366cc;stroke-width: 16px;stroke-linejoin: round;opacity: 0.5}
-    .group.RD-7 { fill: #990099; stroke: #990099;stroke-width: 16px;stroke-linejoin: round;opacity: 0.5}
-    .group.RD-8 { fill: #ff9900; stroke: #ff9900;stroke-width: 16px;stroke-linejoin: round;opacity: 0.5}
-    .group.RD-9 { fill: #109618; stroke: #109618;stroke-width: 16px;stroke-linejoin: round;opacity: 0.5}
-
-    .div.tooltip {	
-        position: absolute;			
-        text-align: center;			
-        width: 60px;					
-        height: 28px;					
-        padding: 2px;				
-        font: 12px sans-serif;		
-        background: lightsteelblue;	
-        border: 0px;		
-        border-radius: 8px;			
-        pointer-events: none;			
-    }
-
-    .place-label {
-        fill: black;
-        fill-opacity: .8;
-        font-size: 20px;
-        font-weight: 300;
-        text-anchor: middle;
-    }
-
-    .container {
-      width: 100px;
-      margin: 0 auto;
-    }
-
-    .button {
-        padding: 0;
-        width: 100px;
-        height: 100px;
-        border: 0;
-        background-color: white;
-        outline: none;
-    }
-    </style>
-</head>
-<body>
-    <div id="Panel">
-        <h1>Territory Allocation Demo</h1>
-        
-        <button id="pre" type="button" onclick="previous()">Previous</button>
-        
-        <button id="play" class="button js-button">
-            <svg viewBox="0 0 36 36" >
-                <defs>
-                    <path id="pause-icon" data-state="playing" d="M11,10 L17,10 17,26 11,26 M20,10 L26,10 26,26 20,26" />
-                    <path id="play-icon"  data-state="paused"  d="M11,10 L18,13.74 18,22.28 11,26 M18,13.74 L26,18 26,18 18,22.28" />
-                </defs>
-                <use xlink:href="#play-icon" />
-            </svg>
-        </button>
-
-
-    </div>
-	<div id="map" style="width: 1024px; height: 600px"></div>
-	<script type="text/javascript">
-    var playButton = {
-        el: document.querySelector(".js-button"),
-        states: {
-            playing: {
-                nextState: "paused",
-                iconEl: document.querySelector("#pause-icon")
-            },
-            paused:  {
-                nextState: "playing",
-                iconEl: document.querySelector("#play-icon")
-            }
-        },
-
-        animationDuration: 350,
-
-        init: function () {
-            this.setInitialState();
-            this.replaceUseEl();
-            this.el.addEventListener("click", this.goToNextState.bind(this));
-        },
-
-        setInitialState: function () {
-          var initialIconRef = this.el.querySelector("use").getAttribute("xlink:href");
-          var stateName = this.el.querySelector(initialIconRef).getAttribute("data-state");
-          this.setState(stateName);
-        },
-
-        replaceUseEl: function () {
-            d3.select(this.el.querySelector("use")).remove();
-            d3.select(this.el.querySelector("svg")).append("path")
-                .attr("class", "js-icon")
-                .attr("d", this.stateIconPath());
-        },
-
-        goToNextState: function () {
-            this.setState(this.state.nextState);
-
-            d3.select(this.el.querySelector(".js-icon")).transition()
-                .duration(this.animationDuration)
-                .attr("d", this.stateIconPath());
-        },
-
-        setState: function (stateName) {
-            this.state = this.states[stateName];
-        },
-
-        stateIconPath: function () {
-            return this.state.iconEl.getAttribute("d");
-        }
-    };
-
-    playButton.init();
-    var map = L.map('map').setView([42.877742, -97.380979], 4);
-    mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
-    L.tileLayer(
-        'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; ' + mapLink + ' Contributors',
-        maxZoom: 18,
-        }).addTo(map);
-    L.svg({clickable:true}).addTo(map);	
-
-    // Sales reps locations
 var reps = {
                   "type": "FeatureCollection",
                   "features": [
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-36",
-                              "group": "RD-9",
+                              "name": "Rep.36",
+                              "group": "RD.9",
                               "territoryscore": 19.8451250971849
                             },
                             "geometry": {
@@ -164,8 +16,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-40",
-                              "group": "RD-9",
+                              "name": "Rep.40",
+                              "group": "RD.9",
                               "territoryscore": 12.8984606671882
                             },
                             "geometry": {
@@ -176,8 +28,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-58",
-                              "group": "RD-9",
+                              "name": "Rep.58",
+                              "group": "RD.9",
                               "territoryscore": 88.1581291736616
                             },
                             "geometry": {
@@ -188,8 +40,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-23",
-                              "group": "RD-9",
+                              "name": "Rep.23",
+                              "group": "RD.9",
                               "territoryscore": 1.75298960867627
                             },
                             "geometry": {
@@ -200,8 +52,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-1",
-                              "group": "RD-1",
+                              "name": "Rep.1",
+                              "group": "RD.1",
                               "territoryscore": 83.7507672590032
                             },
                             "geometry": {
@@ -212,8 +64,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-2",
-                              "group": "RD-1",
+                              "name": "Rep.2",
+                              "group": "RD.1",
                               "territoryscore": 62.4290342478601
                             },
                             "geometry": {
@@ -224,8 +76,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-46",
-                              "group": "RD-1",
+                              "name": "Rep.46",
+                              "group": "RD.1",
                               "territoryscore": 3.59937503211307
                             },
                             "geometry": {
@@ -236,8 +88,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-43",
-                              "group": "RD-1",
+                              "name": "Rep.43",
+                              "group": "RD.1",
                               "territoryscore": 0.659012125086489
                             },
                             "geometry": {
@@ -248,8 +100,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-57",
-                              "group": "RD-1",
+                              "name": "Rep.57",
+                              "group": "RD.1",
                               "territoryscore": 14.8235102584518
                             },
                             "geometry": {
@@ -260,8 +112,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-37",
-                              "group": "RD-1",
+                              "name": "Rep.37",
+                              "group": "RD.1",
                               "territoryscore": 31.6307373366736
                             },
                             "geometry": {
@@ -272,8 +124,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-35",
-                              "group": "RD-1",
+                              "name": "Rep.35",
+                              "group": "RD.1",
                               "territoryscore": 0.69293502329944
                             },
                             "geometry": {
@@ -284,8 +136,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-39",
-                              "group": "RD-1",
+                              "name": "Rep.39",
+                              "group": "RD.1",
                               "territoryscore": 71.6630687200776
                             },
                             "geometry": {
@@ -296,8 +148,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-56",
-                              "group": "RD-1",
+                              "name": "Rep.56",
+                              "group": "RD.1",
                               "territoryscore": 23.0178851837346
                             },
                             "geometry": {
@@ -308,8 +160,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-16",
-                              "group": "RD-4",
+                              "name": "Rep.16",
+                              "group": "RD.4",
                               "territoryscore": 44.2538172032825
                             },
                             "geometry": {
@@ -320,8 +172,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-12",
-                              "group": "RD-4",
+                              "name": "Rep.12",
+                              "group": "RD.4",
                               "territoryscore": 47.7187275615761
                             },
                             "geometry": {
@@ -332,8 +184,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-13",
-                              "group": "RD-4",
+                              "name": "Rep.13",
+                              "group": "RD.4",
                               "territoryscore": 47.3393356412411
                             },
                             "geometry": {
@@ -344,8 +196,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-45",
-                              "group": "RD-4",
+                              "name": "Rep.45",
+                              "group": "RD.4",
                               "territoryscore": 62.4623168616865
                             },
                             "geometry": {
@@ -356,8 +208,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-7",
-                              "group": "RD-4",
+                              "name": "Rep.7",
+                              "group": "RD.4",
                               "territoryscore": 16.7828485833379
                             },
                             "geometry": {
@@ -368,8 +220,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-33",
-                              "group": "RD-4",
+                              "name": "Rep.33",
+                              "group": "RD.4",
                               "territoryscore": 14.0707367185594
                             },
                             "geometry": {
@@ -380,8 +232,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-47",
-                              "group": "RD-4",
+                              "name": "Rep.47",
+                              "group": "RD.4",
                               "territoryscore": 17.0149015040601
                             },
                             "geometry": {
@@ -392,8 +244,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-51",
-                              "group": "RD-4",
+                              "name": "Rep.51",
+                              "group": "RD.4",
                               "territoryscore": 63.0366460734776
                             },
                             "geometry": {
@@ -404,8 +256,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-9",
-                              "group": "RD-5",
+                              "name": "Rep.9",
+                              "group": "RD.5",
                               "territoryscore": 3.1732313907369
                             },
                             "geometry": {
@@ -416,8 +268,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-28",
-                              "group": "RD-5",
+                              "name": "Rep.28",
+                              "group": "RD.5",
                               "territoryscore": 9.59809107068553
                             },
                             "geometry": {
@@ -428,8 +280,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-55",
-                              "group": "RD-5",
+                              "name": "Rep.55",
+                              "group": "RD.5",
                               "territoryscore": 7.95569875675221
                             },
                             "geometry": {
@@ -440,8 +292,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-52",
-                              "group": "RD-5",
+                              "name": "Rep.52",
+                              "group": "RD.5",
                               "territoryscore": 35.6991800295627
                             },
                             "geometry": {
@@ -452,8 +304,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-32",
-                              "group": "RD-5",
+                              "name": "Rep.32",
+                              "group": "RD.5",
                               "territoryscore": 50.1686448443791
                             },
                             "geometry": {
@@ -464,8 +316,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-24",
-                              "group": "RD-5",
+                              "name": "Rep.24",
+                              "group": "RD.5",
                               "territoryscore": 52.3329070030144
                             },
                             "geometry": {
@@ -476,8 +328,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-27",
-                              "group": "RD-5",
+                              "name": "Rep.27",
+                              "group": "RD.5",
                               "territoryscore": 11.5079990216557
                             },
                             "geometry": {
@@ -488,8 +340,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-8",
-                              "group": "RD-5",
+                              "name": "Rep.8",
+                              "group": "RD.5",
                               "territoryscore": 15.5597566664032
                             },
                             "geometry": {
@@ -500,8 +352,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-54",
-                              "group": "RD-5",
+                              "name": "Rep.54",
+                              "group": "RD.5",
                               "territoryscore": 1.62021783723016
                             },
                             "geometry": {
@@ -512,8 +364,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-42",
-                              "group": "RD-6",
+                              "name": "Rep.42",
+                              "group": "RD.6",
                               "territoryscore": 3.07217882222521
                             },
                             "geometry": {
@@ -524,8 +376,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-14",
-                              "group": "RD-6",
+                              "name": "Rep.14",
+                              "group": "RD.6",
                               "territoryscore": 32.0680908657518
                             },
                             "geometry": {
@@ -536,8 +388,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-20",
-                              "group": "RD-6",
+                              "name": "Rep.20",
+                              "group": "RD.6",
                               "territoryscore": 6.74052122868435
                             },
                             "geometry": {
@@ -548,8 +400,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-50",
-                              "group": "RD-6",
+                              "name": "Rep.50",
+                              "group": "RD.6",
                               "territoryscore": 75.5647817173985
                             },
                             "geometry": {
@@ -560,8 +412,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-15",
-                              "group": "RD-6",
+                              "name": "Rep.15",
+                              "group": "RD.6",
                               "territoryscore": 52.9748976561883
                             },
                             "geometry": {
@@ -572,8 +424,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-21",
-                              "group": "RD-3",
+                              "name": "Rep.21",
+                              "group": "RD.3",
                               "territoryscore": 28.0302453051553
                             },
                             "geometry": {
@@ -584,8 +436,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-6",
-                              "group": "RD-3",
+                              "name": "Rep.6",
+                              "group": "RD.3",
                               "territoryscore": 51.1248956905388
                             },
                             "geometry": {
@@ -596,8 +448,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-41",
-                              "group": "RD-3",
+                              "name": "Rep.41",
+                              "group": "RD.3",
                               "territoryscore": 33.0027891153993
                             },
                             "geometry": {
@@ -608,8 +460,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-5",
-                              "group": "RD-3",
+                              "name": "Rep.5",
+                              "group": "RD.3",
                               "territoryscore": 21.0085082552452
                             },
                             "geometry": {
@@ -620,8 +472,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-60",
-                              "group": "RD-3",
+                              "name": "Rep.60",
+                              "group": "RD.3",
                               "territoryscore": 86.2707689916647
                             },
                             "geometry": {
@@ -632,8 +484,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-10",
-                              "group": "RD-3",
+                              "name": "Rep.10",
+                              "group": "RD.3",
                               "territoryscore": 51.7511351016359
                             },
                             "geometry": {
@@ -644,8 +496,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-49",
-                              "group": "RD-3",
+                              "name": "Rep.49",
+                              "group": "RD.3",
                               "territoryscore": 5.57261048317961
                             },
                             "geometry": {
@@ -656,8 +508,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-18",
-                              "group": "RD-2",
+                              "name": "Rep.18",
+                              "group": "RD.2",
                               "territoryscore": 25.7691829905316
                             },
                             "geometry": {
@@ -668,8 +520,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-38",
-                              "group": "RD-2",
+                              "name": "Rep.38",
+                              "group": "RD.2",
                               "territoryscore": 9.4842985255191
                             },
                             "geometry": {
@@ -680,8 +532,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-48",
-                              "group": "RD-2",
+                              "name": "Rep.48",
+                              "group": "RD.2",
                               "territoryscore": 64.4136616470155
                             },
                             "geometry": {
@@ -692,8 +544,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-3",
-                              "group": "RD-2",
+                              "name": "Rep.3",
+                              "group": "RD.2",
                               "territoryscore": 8.17100720014197
                             },
                             "geometry": {
@@ -704,8 +556,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-11",
-                              "group": "RD-2",
+                              "name": "Rep.11",
+                              "group": "RD.2",
                               "territoryscore": 52.1874906091888
                             },
                             "geometry": {
@@ -716,8 +568,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-4",
-                              "group": "RD-2",
+                              "name": "Rep.4",
+                              "group": "RD.2",
                               "territoryscore": 12.492850988439
                             },
                             "geometry": {
@@ -728,8 +580,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-44",
-                              "group": "RD-2",
+                              "name": "Rep.44",
+                              "group": "RD.2",
                               "territoryscore": 46.0034410673635
                             },
                             "geometry": {
@@ -740,8 +592,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-53",
-                              "group": "RD-8",
+                              "name": "Rep.53",
+                              "group": "RD.8",
                               "territoryscore": 0.69124152257303
                             },
                             "geometry": {
@@ -752,8 +604,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-22",
-                              "group": "RD-8",
+                              "name": "Rep.22",
+                              "group": "RD.8",
                               "territoryscore": 20.6034353032592
                             },
                             "geometry": {
@@ -764,8 +616,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-26",
-                              "group": "RD-8",
+                              "name": "Rep.26",
+                              "group": "RD.8",
                               "territoryscore": 78.2905122762309
                             },
                             "geometry": {
@@ -776,8 +628,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-30",
-                              "group": "RD-8",
+                              "name": "Rep.30",
+                              "group": "RD.8",
                               "territoryscore": 18.9492882710973
                             },
                             "geometry": {
@@ -788,8 +640,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-25",
-                              "group": "RD-8",
+                              "name": "Rep.25",
+                              "group": "RD.8",
                               "territoryscore": 1.62304674433586
                             },
                             "geometry": {
@@ -800,8 +652,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-34",
-                              "group": "RD-8",
+                              "name": "Rep.34",
+                              "group": "RD.8",
                               "territoryscore": 63.3867225908168
                             },
                             "geometry": {
@@ -812,8 +664,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-29",
-                              "group": "RD-8",
+                              "name": "Rep.29",
+                              "group": "RD.8",
                               "territoryscore": 4.78037124866209
                             },
                             "geometry": {
@@ -824,8 +676,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-19",
-                              "group": "RD-7",
+                              "name": "Rep.19",
+                              "group": "RD.7",
                               "territoryscore": 33.3667736609154
                             },
                             "geometry": {
@@ -836,8 +688,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-17",
-                              "group": "RD-7",
+                              "name": "Rep.17",
+                              "group": "RD.7",
                               "territoryscore": 5.53952074931064
                             },
                             "geometry": {
@@ -848,8 +700,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-31",
-                              "group": "RD-7",
+                              "name": "Rep.31",
+                              "group": "RD.7",
                               "territoryscore": 74.7975636830509
                             },
                             "geometry": {
@@ -860,8 +712,8 @@ var reps = {
                           {
                             "type": "Feature",  
                             "properties": { 
-                              "name": "Rep-59",
-                              "group": "RD-7",
+                              "name": "Rep.59",
+                              "group": "RD.7",
                               "territoryscore": 77.6344164241844
                             },
                             "geometry": {
@@ -870,278 +722,4 @@ var reps = {
                             }
                         },
                   ]
-    };
-
-	/* We simply pick up the SVG from the map object */
-	var svg = d3.select("#map").select("svg")
-    .attr("pointer-events", "auto");
-	g = svg.append("g");
-    /* Add a LatLng object to each item in the dataset */
-  var p=[]
-  reps.features.forEach(function(d) {
-      d.LatLng = new L.LatLng(d.geometry.coordinates[0],
-                              d.geometry.coordinates[1]);
-      p.push([d.geometry.coordinates[0],d.geometry.coordinates[1]]);
-  })
-  var states = [];
-
-    function checkAndAdd(name) {
-      var id = states.length + 1;
-      var found = states.some(function (e) {
-        return e.properties.id === name;
-      });
-      
-      if (!found) {
-        states.push({
-          "type": "Feature",
-          "properties": {"id":name},
-          "geometry": {
-            "type": "Polygon",
-            "coordinates": [],
-            "points":[]
-          }
-        });
-      }
-    }
-    // Clone the object, not just passing reference
-    var initialStates = JSON.parse(JSON.stringify(states));
-    var initialReps = JSON.parse(JSON.stringify(reps));
-    var story = [
-        {"point":"Rep-56",  "from":"RD-1", "to":"RD-7",	"ts": 3526.89047616342},
-        {"point":"Rep-37",  "from":"RD-1", "to":"RD-9",	"ts":	2617.79937692735},
-        {"point":"Rep-5",   "from":"RD-3", "to":"RD-6",	"ts":	2169.6250047867},
-        {"point":"Rep-38",  "from":"RD-2", "to":"RD-8",	"ts":	2120.51289671583},
-        {"point":"Rep-14",  "from":"RD-6", "to":"RD-9",	"ts":	2079.82293247039},
-        {"point":"Rep-10",  "from":"RD-3", "to":"RD-6",	"ts":	1502.27480620499},    
-    ];
-
-
-    function getHull(){
-        // Clean all points in states
-        states.forEach(function(e){e.geometry.points=[];});
-        // Assign poitns
-        reps.features.forEach(function(d) {
-          // check if the rd exists in the states
-            checkAndAdd(d.properties.group);
-            var target = states.find(function(g){
-                return g.properties.id===d.properties.group
-            });
-            target.geometry.points.push([d.geometry.coordinates[0],d.geometry.coordinates[1]]);
-        })
-        //Calculate hull
-        states.forEach(function(e){
-            if(e.geometry.points.length>=3){            
-              var hull =  d3.polygonHull(e.geometry.points);
-              hull.push([]);
-              e.geometry.coordinates = [hull];
-            }
-      });
-    }
-    
-
-    function projectPoint(x, y) {
-        var point = map.latLngToLayerPoint(new L.LatLng(x, y));
-        this.stream.point(point.x, point.y);
-    }
-
-    var transform = d3.geoTransform({point: projectPoint});
-    var path = d3.geoPath().projection(transform);
-
-    var index = 0;
-    var blinkRepName = story[index].point;
-    var blink = reps.features.findIndex(x => x.properties.name==blinkRepName);
-
-    // Draw the convex hull
-    getHull();
-
-    var featureHull =  svg.selectAll("path")
-        .data(states)
-        .enter()
-        .append("path")
-        .attr("class", function(d){
-          return "group "+d.properties.id.replace(/\s/g,'')})
-
-    // Define the div for the tooltip
-    var div = d3.select("body").append("div")	
-        .attr("class", "tooltip")				
-        .style("opacity", 0);        
-    // reps dot
-
-    var feature = g.selectAll("circle")
-        .data(reps.features)
-        .enter()
-        .append("circle")
-        .attr("class", "dot")
-        .style("opacity", .9) 
-        .style("fill", "red")
-        .style("stroke","black")
-        .attr("r", 6)
-        .on("mouseover", function(d) {
-            console.log("mouse over: "+d.properties.name+", "+ d.properties.group);
-            div.transition()
-                .duration(200)		
-                .style("opacity", .9);		
-            div.html(d.properties.name + "<br/>"  + d.properties.group)	
-                .style("left", (d3.event.pageX) + "px")		
-                .style("top", (d3.event.pageY - 28) + "px");	
-            })					
-        .on("mouseout", function(d) {		
-            div.transition()		
-                .duration(500)		
-                .style("opacity", 0);
-        });
-
-
-
-    var featureLabel = svg.selectAll(".place-label")
-            .data(reps.features)
-            
-    var blinkRing = svg.selectAll("ring")
-        .data(reps.features);
-
-    var textLabel = svg.append("text")
-        .attr('x', 200)
-        .attr('y', 100)
-        .style("font-size", "26px")
-        .attr('fill', '#000')
-        .text(function(d) { return "Initial State" });
-
-
-
-
-// Start the main process
-    var blinkingID;
-    var storyTransitionID;
-    d3.select("#play")
-      .on("click",function(){
-          var self = d3.select(this);
-          if (playButton.state.nextState=="paused"){
-            console.log(playButton.state.nextState);
-            blinkingID = setInterval(transition, 300);
-            storyTransitionID = setInterval(script, 3000);
-          }else{
-            clearInterval(storyTransitionID);
-            clearInterval(blinkingID);
-          }
-    });//end click function
-    map.on("moveend", update);
-    map.on('zoomend', update);
-    update();
-
-    function update() {
-        featureHull.attr("d", path)
-
-        feature.attr("transform", function(d) { 
-            return "translate("+ 
-                map.latLngToLayerPoint(d.LatLng).x +","+ 
-                map.latLngToLayerPoint(d.LatLng).y +")";
-        });
-
-        featureLabel
-          .filter(function(d,i){return i===blink;})
-          .attr("transform", function(d) { 
-              return "translate(" + 
-                  (map.latLngToLayerPoint(d.LatLng).x+10) +","+ 
-                  (map.latLngToLayerPoint(d.LatLng).y-10) +")";
-          })
-          .text(function(d) { return "Next: "+d.properties.name; }); 
-    }
-
-    function script(){
-        // Blinking point id
-        blinkRepName = story[index].point;
-        blink = reps.features.findIndex(x => x.properties.name==blinkRepName);
-        console.log(index)
-        console.log(story[index]);
-        // Change the group
-        reps.features[blink].properties.group = story[index].to;
-        
-        
-        textLabel
-          .transition().duration(500) // Speed of fade-out
-            .style("opacity", 0)
-            .transition().duration(500) // Speed of fade-in
-            .style("opacity", 1)
-          .text(function(d) { return story[index].point+" is moved from "+story[index].from+" to "+story[index].to });
-        
-        featureLabel.enter()
-            .append("text")
-            .attr("class", "place-label")
-            .filter(function(d,i){return i===blink;})
-            .attr("transform", function(d) { 
-            return "translate(" + 
-                (map.latLngToLayerPoint(d.LatLng).x) +","+ 
-                (map.latLngToLayerPoint(d.LatLng).y-20) +")";
-            })
-            .attr("dy", ".35em")
-            .text(function(d) {return d.properties.name; })
-            .transition()
-            .duration(3000)
-            .remove();
-
-        // Update the hull object
-        getHull();
-        // draw hull
-        featureHull.data(states)
-          .transition()
-            .ease(d3.easeLinear)
-            .delay(3000)
-            .duration(1000)
-            .attr("d", path)
-        // update the story
-        
-        if(index==(story.length-1)){
-          index = 0;
-          reps = initialReps;
-        }else{
-          index++;
-        }
-        update();
-    }
-    function transition(){
-        blinkRing.enter()
-        .append("circle")
-        // Using filter to select a specific element
-        .filter(function(d,i){return i===blink;})
-            .attr("class", "ring")
-            .attr("transform", function(d) { 
-                return "translate("+ 
-                    map.latLngToLayerPoint(d.LatLng).x +","+ 
-                    map.latLngToLayerPoint(d.LatLng).y +")";})
-            .attr("r", 6)
-            .style("stroke-width", 1)
-            .style("stroke", "red")
-            .style("fill", "none")
-        .transition()
-            .ease(d3.easeLinear)
-            .duration(1000) // Change Speed
-            .style("stroke-opacity", 1e-6)
-            .style("stroke-width", 3)
-            .style("stroke", "red")
-            .attr("r", 35)
-            .remove();
-    }
-
-    function updateLabel(){
-
-    }
-
-    function previous(){
-      if(index>=2){
-        index = index-2;
-      }
-      else{
-        index = story.length-2
-      }
-
-      script();
-      update();
-    }
-    function next(){
-
-    }
-
-
-</script>
-</body>
-</html>
+                 };
