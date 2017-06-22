@@ -28,17 +28,24 @@
     .group.RD-8 { fill: #ff9900; stroke: #ff9900;stroke-width: 16px;stroke-linejoin: round;opacity: 0.5}
     .group.RD-9 { fill: #109618; stroke: #109618;stroke-width: 16px;stroke-linejoin: round;opacity: 0.5}
 
-    .div.tooltip {	
+    .tooltip {	
         position: absolute;			
         text-align: center;			
-        width: 60px;					
-        height: 28px;					
+        width: 100px;					
+        height: 60px;					
         padding: 2px;				
         font: 12px sans-serif;		
         background: lightsteelblue;	
         border: 0px;		
         border-radius: 8px;			
-        pointer-events: none;			
+        pointer-events: none;		
+        z-index: 314159;
+    }
+
+    #map{
+      width: 1024px; 
+      height: 600px;
+      position: relative;
     }
 
     .place-label {
@@ -82,7 +89,7 @@
 
 
     </div>
-	<div id="map" style="width: 1024px; height: 600px"></div>
+	<div id="map"></div>
 	<script type="text/javascript">
     var playButton = {
         el: document.querySelector(".js-button"),
@@ -870,7 +877,7 @@ var reps = {
                             }
                         },
                   ]
-    };
+  };
 
 	/* We simply pick up the SVG from the map object */
 	var svg = d3.select("#map").select("svg")
@@ -886,22 +893,22 @@ var reps = {
   var states = [];
 
     function checkAndAdd(name) {
-      var id = states.length + 1;
-      var found = states.some(function (e) {
-        return e.properties.id === name;
-      });
-      
-      if (!found) {
-        states.push({
-          "type": "Feature",
-          "properties": {"id":name},
-          "geometry": {
-            "type": "Polygon",
-            "coordinates": [],
-            "points":[]
-          }
+        var id = states.length + 1;
+        var found = states.some(function (e) {
+            return e.properties.id === name;
         });
-      }
+        
+        if (!found) {
+          states.push({
+              "type": "Feature",
+              "properties": {"id":name},
+              "geometry": {
+                "type": "Polygon",
+                "coordinates": [],
+                "points":[]
+            }
+          });
+        }
     }
     // Clone the object, not just passing reference
     var initialStates = JSON.parse(JSON.stringify(states));
@@ -909,7 +916,7 @@ var reps = {
     var story = [
         {"point":"Rep-56",  "from":"RD-1", "to":"RD-7",	"ts": 3526.89047616342},
         {"point":"Rep-37",  "from":"RD-1", "to":"RD-9",	"ts":	2617.79937692735},
-        {"point":"Rep-5",   "from":"RD-3", "to":"RD-6",	"ts":	2169.6250047867},
+        {"point":"Rep-5",   "from":"RD-3", "to":"RD-6",	  "ts":	2169.6250047867},
         {"point":"Rep-38",  "from":"RD-2", "to":"RD-8",	"ts":	2120.51289671583},
         {"point":"Rep-14",  "from":"RD-6", "to":"RD-9",	"ts":	2079.82293247039},
         {"point":"Rep-10",  "from":"RD-3", "to":"RD-6",	"ts":	1502.27480620499},    
@@ -966,7 +973,6 @@ var reps = {
         .attr("class", "tooltip")				
         .style("opacity", 0);        
     // reps dot
-
     var feature = g.selectAll("circle")
         .data(reps.features)
         .enter()
@@ -981,9 +987,9 @@ var reps = {
             div.transition()
                 .duration(200)		
                 .style("opacity", .9);		
-            div.html(d.properties.name + "<br/>"  + d.properties.group)	
-                .style("left", (d3.event.pageX) + "px")		
-                .style("top", (d3.event.pageY - 28) + "px");	
+            div.html("Name: "+d.properties.name + "<br/>"  + "Region: "+d.properties.group+ "<br/>"+"TS: " +d.properties.territoryscore.toFixed(2))	
+                .style("left", (d3.event.pageX) + "px")		 //
+                .style("top",  (d3.event.pageY - 28)+ "px");	 //
             })					
         .on("mouseout", function(d) {		
             div.transition()		
@@ -1055,7 +1061,8 @@ var reps = {
         console.log(story[index]);
         // Change the group
         reps.features[blink].properties.group = story[index].to;
-        
+        // Update the hull object
+        getHull();
         
         textLabel
           .transition().duration(500) // Speed of fade-out
@@ -1079,20 +1086,18 @@ var reps = {
             .duration(3000)
             .remove();
 
-        // Update the hull object
-        getHull();
+        
         // draw hull
         featureHull.data(states)
           .transition()
             .ease(d3.easeLinear)
-            .delay(3000)
-            .duration(1000)
+            .delay(1000)
+            .duration(2000)
             .attr("d", path)
         // update the story
         
         if(index==(story.length-1)){
-          index = 0;
-          reps = initialReps;
+          initialization();
         }else{
           index++;
         }
@@ -1139,6 +1144,14 @@ var reps = {
     }
     function next(){
 
+    }
+
+    function initialization(){
+          index = 0;
+          reps =JSON.parse(JSON.stringify(initialReps));
+          playButton.setState("playing");
+          clearInterval(storyTransitionID);
+          clearInterval(blinkingID);
     }
 
 
